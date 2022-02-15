@@ -3,6 +3,7 @@
 import sys
 from pennylane import numpy as np
 import pennylane as qml
+from collections import deque
 
 graph = {
     0: [1],
@@ -30,6 +31,24 @@ def n_swaps(cnot):
 
     # QHACK #
 
+    def bfs(s, t):
+        q = deque()
+        q.append(s)
+        visited = [0 for i in range(10)]
+        d = [0 for i in range(10)]
+        while q:
+            u = q.popleft()
+            for v in graph[u]:
+                if not visited[v]:
+                    q.append(v)
+                    visited[v] = 1
+                    d[v] = 1 + d[u]
+        return d[t]
+
+    arr = cnot.wires.tolist()
+    control = arr[0]
+    target = arr[1]
+    return 2 * (bfs(control, target) - 1)
     # QHACK #
 
 

@@ -16,7 +16,9 @@ def matrix_norm(mixed_state, pure_state):
         - (float): The matrix one-norm
     """
 
-    return np.sum(np.abs(mixed_state - np.outer(pure_state, np.conj(pure_state))))
+    return np.sum(
+        np.abs(np.outer(mixed_state, np.conj(mixed_state))
+               - np.outer(pure_state, np.conj(pure_state))))
 
 
 def compare_circuits(num_wires, params):
@@ -33,8 +35,16 @@ def compare_circuits(num_wires, params):
 
     # QHACK #
     # define devices
+    dev1 = qml.device('default.qubit', wires=num_wires, shots=1)
+    dev2 = qml.device('default.qubit', wires=num_wires, shots=1)
+
+    arr1 = params[0].tolist()
+    arr2 = params[1].tolist()
+    # print(arr1, arr2)
+    # print(num_wires)
 
     # add a decorator here
+    @qml.qnode(dev1)
     def pure_circuit():
         """A circuit that contains `num_wires` y-rotation gates.
         The argument params[0] are the parameters you should use here to define the y-rotations.
@@ -43,9 +53,12 @@ def compare_circuits(num_wires, params):
             - (np.tensor): A state vector
         """
         # create the circuit here
+        for i in range(num_wires):
+            qml.RY(arr1[i], wires=i)
         return qml.state()
 
     # add a decorator here
+    @qml.qnode(dev2)
     def mixed_circuit():
         """A circuit that contains `num_wires` y-rotation gates.
         The argument params[1] are the parameters you should use here to define the y-rotations.
@@ -54,6 +67,8 @@ def compare_circuits(num_wires, params):
             - (np.tensor): A density matrix
         """
         # create the circuit here
+        for i in range(num_wires):
+            qml.RY(arr2[i], wires=i)
         return qml.state()
 
     # QHACK #
@@ -72,8 +87,8 @@ if __name__ == "__main__":
     num_wires = int(inputs[0])
     l = int(len(inputs[1:]) / 2)
     params = [
-        np.array(inputs[1 : (l + 1)], dtype=float),  # for pure circuit
-        np.array(inputs[(l + 1) :], dtype=float),  # for mixed circuit
+        np.array(inputs[1: (l + 1)], dtype=float),  # for pure circuit
+        np.array(inputs[(l + 1):], dtype=float),  # for mixed circuit
     ]
 
     output = compare_circuits(num_wires, params)

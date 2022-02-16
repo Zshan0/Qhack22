@@ -1,6 +1,7 @@
 #! /usr/bin/python3
 
 import sys
+import math
 import pennylane as qml
 from pennylane import numpy as np
 
@@ -23,8 +24,37 @@ def error_wire(circuit_output):
 
     # QHACK #
     # process the circuit output here and return which qubit was the victim of a bitflip error!
-    ans = [0.0, 0.0, 0.0, 0.0]
-    print(circuit_output)
+    p = -1
+    alpha = -1
+    wire = -1
+    out = circuit_output
+
+    # finding p
+    if out[0] == 0 and out[7] == 0:
+        p = 1
+    elif out[0] == 0 or out[7] == 0:
+        alpha = 0
+        p = 1 - max(out[0], out[7])
+    else:
+        # out[0] or out[7] are not 0
+        k = out[0]/out[7]
+        alpha = math.sqrt(k / (1 + k))
+        p = 1 - out[0]/(alpha ** 2)
+
+    if p == 0:
+        return [1, 0, 0, 0]
+
+    # finding wire which is tampered
+    # p != 0
+    for i in range(0, 3):
+        if out[3 - i] != 0 or out[3 + i + 1] != 0:
+            wire = i
+            break
+    # print(circuit_output)
+    # print(p, alpha, wire)
+    assert wire != -1 and p != -1
+    ans = [1 - p, 0, 0, 0]
+    ans[wire + 1] = p
     return ans
     # QHACK #
 
@@ -57,12 +87,12 @@ def circuit(p, alpha, tampered_wire):
     qml.BitFlip(p, wires=int(tampered_wire))
 
     # put any gates here after the bitflip error has occurred
-    qml.CNOT(wires=[0, 1])
-    qml.CNOT(wires=[0, 2])
-    qml.Toffoli(wires=[1, 2, 0])
+    # qml.CNOT(wires=[0, 1])
+    # qml.CNOT(wires=[0, 2])
+    # qml.Toffoli(wires=[1, 2, 0])
 
-    return qml.probs(wires=[0])
-    # QHACK #
+    return qml.probs(wires=[0, 1, 2])
+    # QHACK #e
 
 
 def density_matrix(alpha):

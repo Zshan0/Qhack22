@@ -3,6 +3,7 @@
 import sys
 import pennylane as qml
 from pennylane import numpy as np
+import math
 
 
 dev = qml.device("default.qubit", wires=2)
@@ -18,7 +19,9 @@ def prepare_entangled(alpha, beta):
     """
 
     # QHACK #
-
+    alpha = alpha / math.sqrt(alpha ** 2 + beta ** 2)
+    qml.PauliY(2 * math.acos(alpha), wires=0)
+    qml.CNOT(wires=[0, 1])
     # QHACK #
 
 @qml.qnode(dev)
@@ -42,6 +45,9 @@ def chsh_circuit(theta_A0, theta_A1, theta_B0, theta_B1, x, y, alpha, beta):
     prepare_entangled(alpha, beta)
 
     # QHACK #
+    if x == 0:
+        
+    else:
 
     # QHACK #
 

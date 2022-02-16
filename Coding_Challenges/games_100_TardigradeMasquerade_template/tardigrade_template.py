@@ -27,7 +27,35 @@ def compute_entanglement(theta):
 
     # QHACK #
 
+    @qml.qnode(dev)
+    def normal_circuit(theta):
+
+        qml.PauliX(1)
+        qml.Hadamard(0)
+        qml.CNOT(wires=[0, 1])
+        # max ent state prepped
+
+        return qml.density_matrix(1)
+
     # QHACK #
+
+    @qml.qnode(dev)
+    def tardigrade_circuit(theta):
+
+        CRy = qml.ctrl(qml.RY, control=[0])
+        CX = qml.ctrl(qml.PauliX, control=[0])
+        CCX = qml.ctrl(qml.PauliX, control=[0, 1])
+
+        qml.Hadamard(0)
+        CRy(theta, wires=[1])
+        CX(wires=[1])
+        CX(wires=[2])
+        CCX(wires=[2])
+        qml.PauliX(0)
+
+        return qml.density_matrix(1)
+
+    return second_renyi_entropy(normal_circuit(theta)), second_renyi_entropy(tardigrade_circuit(theta))
 
 
 if __name__ == "__main__":

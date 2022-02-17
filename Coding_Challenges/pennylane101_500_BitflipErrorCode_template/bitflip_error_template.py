@@ -37,9 +37,9 @@ def error_wire(circuit_output):
         p = 1 - max(out[0], out[7])
     else:
         # out[0] or out[7] are not 0
-        k = out[0]/out[7]
+        k = out[0] / out[7]
         alpha = math.sqrt(k / (1 + k))
-        p = 1 - out[0]/(alpha ** 2)
+        p = 1 - out[0] / (alpha**2)
 
     if p == 0:
         return [1, 0, 0, 0]

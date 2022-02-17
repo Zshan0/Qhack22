@@ -8,7 +8,7 @@ dev = qml.device("default.qubit", wires=3)
 
 
 def my_finite_diff_grad(params):
-    """Function that returns the gradients of the cost function (defined below) with respect 
+    """Function that returns the gradients of the cost function (defined below) with respect
     to all parameters in params.
 
     Args:
@@ -35,7 +35,7 @@ def my_finite_diff_grad(params):
 
 def variational_circuit(params):
     """A layered variational circuit. The first layer comprises of x, y, and z rotations on wires
-    0, 1, and 2, respectively. The second layer is a ring of CNOT gates. The final layer comprises 
+    0, 1, and 2, respectively. The second layer is a ring of CNOT gates. The final layer comprises
     of x, y, and z rotations on wires 0, 1, and 2, respectively.
     """
 

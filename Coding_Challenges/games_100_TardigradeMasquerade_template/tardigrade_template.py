@@ -55,7 +55,9 @@ def compute_entanglement(theta):
 
         return qml.density_matrix(1)
 
-    return second_renyi_entropy(normal_circuit(theta)), second_renyi_entropy(tardigrade_circuit(theta))
+    return second_renyi_entropy(normal_circuit(theta)), second_renyi_entropy(
+        tardigrade_circuit(theta)
+    )
 
 
 if __name__ == "__main__":

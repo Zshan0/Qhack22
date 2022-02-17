@@ -3,6 +3,7 @@
 import sys
 import pennylane as qml
 from pennylane import numpy as np
+from sqlalchemy import true
 
 
 def binary_list(m, n):
@@ -56,7 +57,10 @@ def is_particle_preserving(circuit, n):
     """
 
     # QHACK #
-
+    state = [0 for i in range(n)]
+    x = circuit(state)
+    print(x, n)
+    return 2 ** n == len(x)
     # QHACK #
 
 

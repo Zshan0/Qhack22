@@ -3,6 +3,7 @@
 import sys
 from pennylane import numpy as np
 import pennylane as qml
+import math
 
 
 def qfunc_adder(m, wires):
@@ -16,7 +17,8 @@ def qfunc_adder(m, wires):
     qml.QFT(wires=wires)
 
     # QHACK #
-
+    for i in wires:
+        qml.RZ(m * math.pi / (2 ** i), wires=i)
     # QHACK #
 
     qml.QFT(wires=wires).inv()

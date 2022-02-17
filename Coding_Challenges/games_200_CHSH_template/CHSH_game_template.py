@@ -24,6 +24,7 @@ def prepare_entangled(alpha, beta):
     qml.CNOT(wires=[0, 1])
     # QHACK #
 
+
 @qml.qnode(dev)
 def chsh_circuit(theta_A0, theta_A1, theta_B0, theta_B1, x, y, alpha, beta):
     """Construct a circuit that implements Alice's and Bob's measurements in the rotated bases
@@ -45,14 +46,15 @@ def chsh_circuit(theta_A0, theta_A1, theta_B0, theta_B1, x, y, alpha, beta):
     prepare_entangled(alpha, beta)
 
     # QHACK #
-    if x == 0:
-        
-    else:
+    theta_A = [theta_A0, theta_A1]
+    theta_B = [theta_B0, theta_B1]
 
+    qml.RY(- 2 * theta_A[x], wires=0)
+    qml.RY(- 2 * theta_B[y], wires=1)
     # QHACK #
 
     return qml.probs(wires=[0, 1])
-    
+
 
 def winning_prob(params, alpha, beta):
     """Define a function that returns the probability of Alice and Bob winning the game.
@@ -67,9 +69,15 @@ def winning_prob(params, alpha, beta):
     """
 
     # QHACK #
+    phi = params
+    return (1/4
+            * (3 * math.cos(phi) ** 2 + math.sin(3 * phi) ** 2
+                + (2 * alpha * math.sqrt(1 - alpha ** 2) - 1) *
+                (math.sin(4 * phi) * math.sin(2 * phi))
+               ))
 
     # QHACK #
-    
+
 
 def optimize(alpha, beta):
     """Define a function that optimizes theta_A0, theta_A1, theta_B0, theta_B1 to maximize the probability of winning the game
@@ -82,28 +90,35 @@ def optimize(alpha, beta):
         - (float): Probability of winning
     """
 
-    def cost(params):
+    def cost(alpha, phi):
         """Define a cost function that only depends on params, given alpha and beta fixed"""
+        return (-1/4
+                * (3 * math.cos(phi) ** 2 + math.sin(3 * phi) ** 2
+                   + (2 * alpha * math.sqrt(1 - alpha ** 2) - 1) *
+                   (math.sin(4 * phi) * math.sin(2 * phi))
+                   ))
 
     # QHACK #
 
-    #Initialize parameters, choose an optimization method and number of steps
-    init_params = 
-    opt =
-    steps =
+    # Initialize parameters, choose an optimization method and number of steps
+    alpha = alpha / math.sqrt(alpha ** 2 + beta ** 2)
+    beta = math.sqrt(1 - alpha ** 2)
+    phi = 0
 
     # QHACK #
-    
+    curr_cost = 0
     # set the initial parameter values
-    params = init_params
-
-    for i in range(steps):
-        # update the circuit parameters 
+    while phi <= math.pi / 4:
+        # update the circuit parameters
         # QHACK #
+        if cost(alpha, phi) >= curr_cost:
+            break
+        curr_cost = cost(alpha, phi)
+        phi += 1e-8
+    assert phi <= math.pi / 4
+    # QHACK #
 
-        params = 
-
-        # QHACK #
+    params = phi
 
     return winning_prob(params, alpha, beta)
 

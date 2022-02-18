@@ -16,7 +16,13 @@ def triple_excitation_matrix(gamma):
     """
 
     # QHACK #
+    arr = np.eye(2 ** 6)
+    arr[7, 7] = np.cos(gamma / 2)
+    arr[56, 56] = np.cos(gamma / 2)
 
+    arr[7, 56] = np.sin(gamma / 2)
+    arr[56, 7] = -np.sin(gamma / 2)
+    return arr
     # QHACK #
 
 
@@ -36,7 +42,13 @@ def circuit(angles):
     """
 
     # QHACK #
+    qml.PauliX(wires=0)
+    qml.PauliX(wires=1)
+    qml.PauliX(wires=2)
 
+    qml.SingleExcitation(angles[0], wires=[0, 5])
+    qml.DoubleExcitation(angles[1], wires=[0, 1, 4, 5])
+    qml.QubitUnitary(triple_excitation_matrix(angles[2]), wires=list(range(NUM_WIRES)))
     # QHACK #
 
     return qml.probs(wires=range(NUM_WIRES))

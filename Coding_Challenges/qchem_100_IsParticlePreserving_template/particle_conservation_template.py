@@ -3,7 +3,6 @@
 import sys
 import pennylane as qml
 from pennylane import numpy as np
-from sqlalchemy import true
 
 
 def binary_list(m, n):
@@ -19,7 +18,12 @@ def binary_list(m, n):
 
     arr = []
     # QHACK #
-
+    while m != 0:
+        arr.append(m % 2)
+        m //= 2
+    for _ in range(len(arr), n):
+        arr.append(0)
+    arr.reverse()
     # QHACK #
     return arr
 
@@ -38,7 +42,8 @@ def basis_states(n):
     arr = []
 
     # QHACK #
-
+    for m in range(2 ** n):
+        arr.append(binary_list(m, n))
     # QHACK #
 
     return arr
@@ -57,10 +62,26 @@ def is_particle_preserving(circuit, n):
     """
 
     # QHACK #
-    state = [0 for i in range(n)]
-    x = circuit(state)
-    print(x, n)
-    return 2 ** n == len(x)
+    states = basis_states(n)
+    finals = []
+    
+    for state in states:
+        finals.append(circuit(state))
+        
+    for i in range(2 ** n):
+        count_inp = 0
+        for val in states[i]:
+            count_inp += val
+        for j in range(2 ** n):
+            if finals[i][j] != 0:
+                count_out = 0
+                for val in states[j]:
+                    count_out += val
+                if count_inp != count_out:
+                    return False
+    
+    return True
+
     # QHACK #
 
 

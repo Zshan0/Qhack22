@@ -90,37 +90,6 @@ def winning_prob(params, alpha, beta):
     # QHACK #
 
 
-def cost_new(params, alpha, beta):
-    """Define a function that returns the probability of Alice and Bob winning the game.
-    Args:
-        - params (list(float)): List containing [theta_A0,theta_A1,theta_B0,theta_B1]
-        - alpha (float): real coefficient of |00>
-        - beta (float): real coefficient of |11>
-    Returns:
-        - (float): Probability of winning the game
-    """
-    params = params._value
-
-    # QHACK #
-    def probs_theta(theta_A, theta_B):
-        term1 = math.cos(theta_B - theta_A) ** 2
-        term21 = (4 * alpha * beta) - 2
-        term22 = (
-            math.cos(theta_A)
-            * math.sin(theta_A)
-            * math.sin(theta_B)
-            * math.cos(theta_B)
-        )
-        return term1 + (term21 * term22)
-
-    val = probs_theta(params[0], params[2])
-    val += probs_theta(params[0], params[3])
-    val += probs_theta(params[1], params[2])
-    val += 1 - probs_theta(params[1], params[3])
-
-    return val / 4
-
-
 def optimize(alpha, beta):
     """Define a function that optimizes theta_A0, theta_A1, theta_B0, theta_B1 to maximize the probability of winning the game
 
@@ -133,7 +102,7 @@ def optimize(alpha, beta):
     """
     def cost(params):
         """Define a cost function that only depends on params, given alpha and beta fixed"""
-        return -cost_new(params, alpha, beta)
+        return -winning_prob(params, alpha, beta)
 
 
     # QHACK #
@@ -141,8 +110,8 @@ def optimize(alpha, beta):
     # Initialize parameters, choose an optimization method and number of steps
     alpha, beta = normalize(alpha, beta)
     init_params = np.random.rand(4, requires_grad=True)
-    opt = qml.GradientDescentOptimizer(stepsize=1e-4)
-    steps = int(5000)
+    opt = qml.NesterovMomentumOptimizer(stepsize=1e-2, momentum=0.8)
+    steps = int(500)
 
     # QHACK #
     

@@ -20,11 +20,14 @@ def is_bomb(angle):
     """
 
     # QHACK #
-
+    splitter(angle)
     # QHACK #
 
     return qml.sample(qml.PauliZ(0))
 
+
+def splitter(angle):
+    qml.RY(2 * angle, wires=0)
 
 @qml.qnode(dev)
 def bomb_tester(angle):
@@ -38,6 +41,7 @@ def bomb_tester(angle):
     """
 
     # QHACK #
+    splitter(angle)
 
     # QHACK #
 
@@ -56,6 +60,29 @@ def simulate(angle, n):
     """
 
     # QHACK #
+    explosion, non_explosion_detection, no_explosion = 0, 0, 0
+    shots = 10000
+
+    for _ in range(shots):
+        did_explode = False
+        for _ in range(n):
+            bomb = is_bomb(angle)
+            if bomb == 1:
+                # the bomb exploded
+                did_explode = True
+                break
+
+        if not did_explode:
+            test = bomb_tester(angle)
+            no_explosion += 1
+            if test == -1:
+                # bomb detected without explosion
+                non_explosion_detection += 1
+        else:
+            did_explode += 1
+
+
+    return non_explosion_detection / no_explosion
 
     # QHACK #
 

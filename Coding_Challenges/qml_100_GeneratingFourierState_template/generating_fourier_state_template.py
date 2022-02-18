@@ -25,10 +25,6 @@ def generating_fourier_state(n_qubits, m):
     def circuit(angles):
         """This is the quantum circuit that we will use."""
 
-        # QHACK #
-
-        # Add the template of the statement with the angles passed as an argument.
-
         for i in range(n_qubits):
             qml.Hadamard(i)
             qml.RZ(angles[i], wires=i)

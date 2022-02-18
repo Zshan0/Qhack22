@@ -1,8 +1,10 @@
 #! /usr/bin/python3
 
+import math
 import sys
 from pennylane import numpy as np
 import pennylane as qml
+from torch import normal
 
 
 def distance(A, B):
@@ -21,9 +23,48 @@ def distance(A, B):
     # The Swap test is a method that allows you to calculate |<A|B>|^2 , you could use it to help you.
     # The qml.AmplitudeEmbedding operator could help you too.
 
-    # dev = qml.device("default.qubit", ...
-    # @qml.qnode(dev)
+    dev = qml.device("default.qubit", wires=3)
 
+    def normalize(v):
+        norm = math.sqrt(v[0] ** 2 + v[1] ** 2)
+        if abs(norm - 0) < 1e-3:
+            return [0, 0]
+        return [v[0]/norm, v[1]/norm]
+
+    @qml.qnode(dev)
+    def swap_test(A, B):
+
+        A = normalize(A)
+        B = normalize(B)
+
+        theta_A = 0
+        theta_B = 0
+
+        try:
+            theta_A = 2 * math.acos(A[0])
+        except:
+            theta_A = 0
+
+        try:
+            theta_B = 2 * math.acos(B[0])
+        except:
+            theta_B = 0
+
+        qml.RY(theta_A, wires=1)
+        qml.RY(theta_B, wires=2)
+
+        # x = np.concatenate((A, B))
+        # print(A, B)
+        # print(x)
+        # qml.AmplitudeEmbedding(x, wires=[1, 2])
+
+        qml.Hadamard(wires=0)
+        qml.CSWAP(wires=[0, 1, 2])
+        qml.Hadamard(wires=0)
+
+        return qml.expval(qml.PauliZ(0))
+
+    return np.sqrt(2 * (1 - np.sqrt(np.abs(swap_test(A, B)))))
     # QHACK #
 
 
@@ -57,7 +98,8 @@ def predict(dataset, new, k):
     output = k_nearest_classes()
 
     return (
-        "YES" if len([i for i in output if i == "YES"]) > len(output) / 2 else "NO",
+        "YES" if len([i for i in output if i == "YES"]
+                     ) > len(output) / 2 else "NO",
         float(distance(dataset[0][0], new)),
     )
 
@@ -69,7 +111,8 @@ if __name__ == "__main__":
     new = [int(inputs[0]), int(inputs[1])]
     k = int(inputs[2])
     for i in range(3, len(inputs), 3):
-        dataset.append([[int(inputs[i + 0]), int(inputs[i + 1])], str(inputs[i + 2])])
+        dataset.append(
+            [[int(inputs[i + 0]), int(inputs[i + 1])], str(inputs[i + 2])])
 
     output = predict(dataset, new, k)
     sol = 0 if output[0] == "YES" else 1

@@ -23,18 +23,38 @@ def find_the_car(oracle):
     def circuit1():
         # QHACK #
 
+        qml.Hadamard(1)
+        qml.PauliX("sol")
+        qml.Hadamard("sol")
+
+        oracle()
+
+        qml.Hadamard(1)
+
         # QHACK #
-        return qml.sample()
+        return qml.sample(wires=1)
 
     @qml.qnode(dev)
-    def circuit2():
+    def circuit2(pos):
         # QHACK #
 
+        if pos == 0:
+            qml.PauliX(0)
+        oracle()
+
         # QHACK #
-        return qml.sample()
+        return qml.sample(wires="sol")
 
     sol1 = circuit1()
-    sol2 = circuit2()
+    sol2 = circuit2(sol1)
+
+    answer = 0
+    if sol1 == 0:
+        answer += 2
+    if sol2 == 0:
+        answer += 1
+
+    return answer
 
     # QHACK #
 

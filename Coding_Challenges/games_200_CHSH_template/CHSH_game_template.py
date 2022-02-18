@@ -24,13 +24,13 @@ def prepare_entangled(alpha, beta):
     """
 
     # QHACK #
-    alpha, beta = normalize(alpha, beta)
     qml.RY(2 * math.acos(alpha), wires=0)
     qml.CNOT(wires=[0, 1])
     # QHACK #
 
 
-@qml.qnode(dev)
+# @qml.qnode(dev)
+@qml.qnode(dev, interface='autograd')
 def chsh_circuit(theta_A0, theta_A1, theta_B0, theta_B1, x, y, alpha, beta):
     """Construct a circuit that implements Alice's and Bob's measurements in the rotated bases
 
@@ -47,7 +47,6 @@ def chsh_circuit(theta_A0, theta_A1, theta_B0, theta_B1, x, y, alpha, beta):
     Returns:
         - (np.tensor): Probabilities of each basis state
     """
-    alpha, beta = normalize(alpha, beta)
     prepare_entangled(alpha, beta)
 
     # QHACK #
@@ -72,7 +71,35 @@ def winning_prob(params, alpha, beta):
     Returns:
         - (float): Probability of winning the game
     """
-    alpha, beta = normalize(alpha, beta)
+    # QHACK #
+    answer = 0
+
+    probs = chsh_circuit(*params, x=0, y=0, alpha=alpha, beta=beta)
+    answer += (probs[0] + probs[3]) # 0.0 = 0 + 0  or 1 + 1
+    probs = chsh_circuit(*params, x=0, y=1, alpha=alpha, beta=beta)
+    answer += (probs[0] + probs[3]) # 0.1 = 0 + 0  or 1 + 1
+    probs = chsh_circuit(*params, x=1, y=0, alpha=alpha, beta=beta)
+    answer += (probs[0] + probs[3]) # 1.0 = 0 + 0  or 1 + 1
+    probs = chsh_circuit(*params, x=1, y=1, alpha=alpha, beta=beta)
+    answer += (probs[1] + probs[2]) # 1.1 = 1 + 0  or 1 + 0
+    
+    answer = answer / 4
+    return answer
+    
+
+    # QHACK #
+
+
+def cost_new(params, alpha, beta):
+    """Define a function that returns the probability of Alice and Bob winning the game.
+    Args:
+        - params (list(float)): List containing [theta_A0,theta_A1,theta_B0,theta_B1]
+        - alpha (float): real coefficient of |00>
+        - beta (float): real coefficient of |11>
+    Returns:
+        - (float): Probability of winning the game
+    """
+    params = params._value
 
     # QHACK #
     def probs_theta(theta_A, theta_B):
@@ -93,8 +120,6 @@ def winning_prob(params, alpha, beta):
 
     return val / 4
 
-    # QHACK #
-
 
 def optimize(alpha, beta):
     """Define a function that optimizes theta_A0, theta_A1, theta_B0, theta_B1 to maximize the probability of winning the game
@@ -106,37 +131,33 @@ def optimize(alpha, beta):
     Returns:
         - (float): Probability of winning
     """
-    alpha, beta = normalize(alpha, beta)
-
     def cost(params):
         """Define a cost function that only depends on params, given alpha and beta fixed"""
-        return -winning_prob(params, alpha, beta)
+        return -cost_new(params, alpha, beta)
 
-    def get_params(phi):
-        return [0, 2 * phi, phi, -phi]
 
     # QHACK #
 
     # Initialize parameters, choose an optimization method and number of steps
-    phi = 0
-    precision = 1e-6
+    alpha, beta = normalize(alpha, beta)
+    init_params = np.random.rand(4, requires_grad=True)
+    opt = qml.GradientDescentOptimizer(stepsize=1e-4)
+    steps = int(5000)
 
     # QHACK #
-    curr_cost = 0
+    
     # set the initial parameter values
-    while phi <= math.pi / 4:
-        # update the circuit parameters
+    params = init_params
+
+    for _ in range(steps):
+        # update the circuit parameters 
         # QHACK #
-        params = get_params(phi)
-        if cost(params) >= curr_cost:
-            break
-        curr_cost = cost(params)
-        phi += precision
 
-    assert phi <= math.pi / 4
-    # QHACK #
+        params = opt.step(cost, params)
 
-    return winning_prob(get_params(phi), alpha, beta)
+        # QHACK #
+
+    return winning_prob(params, alpha, beta)
 
 
 if __name__ == "__main__":

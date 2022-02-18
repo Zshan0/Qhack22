@@ -2,9 +2,9 @@
 
 import math
 import sys
+from numpy import inner
 from pennylane import numpy as np
 import pennylane as qml
-from torch import normal
 
 
 def distance(A, B):
@@ -23,7 +23,7 @@ def distance(A, B):
     # The Swap test is a method that allows you to calculate |<A|B>|^2 , you could use it to help you.
     # The qml.AmplitudeEmbedding operator could help you too.
 
-    dev = qml.device("default.qubit", wires=3)
+    # dev = qml.device("default.qubit", wires=3)
 
     def normalize(v):
         norm = math.sqrt(v[0] ** 2 + v[1] ** 2)
@@ -31,40 +31,29 @@ def distance(A, B):
             return [0, 0]
         return [v[0]/norm, v[1]/norm]
 
-    @qml.qnode(dev)
-    def swap_test(A, B):
+    # @qml.qnode(dev)
+    # def swap_test(A, B):
 
-        A = normalize(A)
-        B = normalize(B)
+    #     A = normalize(A)
+    #     B = normalize(B)
 
-        theta_A = 0
-        theta_B = 0
+    #     theta_A = 2 * math.acos(A[0])
+    #     theta_B = 2 * math.acos(B[0])
 
-        try:
-            theta_A = 2 * math.acos(A[0])
-        except:
-            theta_A = 0
+    #     qml.RY(theta_A, wires=1)
+    #     qml.RY(theta_B, wires=2)
 
-        try:
-            theta_B = 2 * math.acos(B[0])
-        except:
-            theta_B = 0
+    #     qml.Hadamard(wires=0)
+    #     qml.CSWAP(wires=[0, 1, 2])
+    #     qml.Hadamard(wires=0)
 
-        qml.RY(theta_A, wires=1)
-        qml.RY(theta_B, wires=2)
+    #     return qml.probs(wires=0)
 
-        # x = np.concatenate((A, B))
-        # print(A, B)
-        # print(x)
-        # qml.AmplitudeEmbedding(x, wires=[1, 2])
+    # ip = 1 - 2 * swap_test(A, B)[1]
 
-        qml.Hadamard(wires=0)
-        qml.CSWAP(wires=[0, 1, 2])
-        qml.Hadamard(wires=0)
-
-        return qml.expval(qml.PauliZ(0))
-
-    return np.sqrt(2 * (1 - np.sqrt(np.abs(swap_test(A, B)))))
+    A = normalize(A)
+    B = normalize(B)
+    return np.sqrt(np.abs(2 * (1 - np.dot(A, B))))
     # QHACK #
 
 

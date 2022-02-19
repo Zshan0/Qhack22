@@ -21,7 +21,7 @@ def oracle_matrix(indices):
     """
 
     # QHACK #
-    my_array = np.identity(2 ** 4)
+    my_array = np.identity(2**4)
     for i in indices:
         my_array[i, i] = -1
     # QHACK #
@@ -33,8 +33,8 @@ def diffusion_matrix():
 
     # DO NOT MODIFY anything in this code block
 
-    psi_piece = (1 / 2 ** 4) * np.ones(2 ** 4)
-    ident_piece = np.eye(2 ** 4)
+    psi_piece = (1 / 2**4) * np.ones(2**4)
+    ident_piece = np.eye(2**4)
     return 2 * psi_piece - ident_piece
 
 
@@ -70,8 +70,8 @@ def circuit(indices):
         qml.Hadamard(wires=i)
     unitary = grover_operator(indices)
     QuantumPhaseEstimation(
-        unitary, target_wires=target_wires,
-        estimation_wires=estimation_wires)
+        unitary, target_wires=target_wires, estimation_wires=estimation_wires
+    )
     # QHACK #
 
     return qml.probs(estimation_wires)
@@ -106,22 +106,22 @@ def relative_error(indices):
     Args:
         - indices (list(int)): A list of bits representing the elements that map to 1.
 
-    Returns: 
+    Returns:
         - (float): relative error
     """
 
     # QHACK #
 
-    rel_err = 100 * (
-        number_of_solutions(indices)
-        - float(len(indices))) / float(len(indices))
+    rel_err = (
+        100 * (number_of_solutions(indices) - float(len(indices))) / float(len(indices))
+    )
 
     # QHACK #
 
     return rel_err
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # DO NOT MODIFY anything in this code block
     inputs = sys.stdin.read().split(",")
     lst = [int(i) for i in inputs]

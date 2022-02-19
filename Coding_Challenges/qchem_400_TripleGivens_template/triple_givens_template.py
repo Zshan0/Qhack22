@@ -16,7 +16,7 @@ def triple_excitation_matrix(gamma):
     """
 
     # QHACK #
-    arr = np.eye(2 ** 6)
+    arr = np.eye(2**6)
     arr[7, 7] = np.cos(gamma / 2)
     arr[56, 56] = np.cos(gamma / 2)
 

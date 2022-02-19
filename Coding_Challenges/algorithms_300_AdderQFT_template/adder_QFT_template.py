@@ -18,7 +18,7 @@ def qfunc_adder(m, wires):
 
     # QHACK #
     for i in wires:
-        qml.RZ(m * math.pi / (2 ** i), wires=i)
+        qml.RZ(m * math.pi / (2**i), wires=i)
     # QHACK #
 
     qml.QFT(wires=wires).inv()

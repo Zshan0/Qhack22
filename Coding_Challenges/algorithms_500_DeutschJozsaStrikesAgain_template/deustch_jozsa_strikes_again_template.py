@@ -17,7 +17,39 @@ def deutsch_jozsa(fs):
     """
 
     # QHACK #
+    def oracle():
+        fs[0](wires=[0, 1, 8])
+        fs[1](wires=[2, 3, 8])
+        fs[2](wires=[4, 5, 8])
+        fs[3](wires=[6, 7, 8])
 
+    dev = qml.device("default.qubit", wires=9, shots=1)
+
+    @qml.qnode(dev)
+    def circuit():
+        """Implements the Deutsch Jozsa algorithm."""
+
+        qml.PauliX(wires=8)
+        for i in range(9):
+            qml.Hadamard(wires=[i])
+
+        oracle()
+
+        for i in range(8):
+            qml.Hadamard(wires=i)
+
+        return qml.sample(wires=range(8))
+
+    sample = circuit()
+    num_const = 0
+    for i in range(0, 8, 2):
+        if sample[i] == 0 and sample[i+1] == 0:
+            num_const += 1
+
+    if num_const == 2:
+        return "2 and 2"
+    else:
+        return "4 same"
     # QHACK #
 
 

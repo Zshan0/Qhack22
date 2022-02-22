@@ -42,7 +42,7 @@ def basis_states(n):
     arr = []
 
     # QHACK #
-    for m in range(2 ** n):
+    for m in range(2**n):
         arr.append(binary_list(m, n))
     # QHACK #
 
@@ -64,22 +64,22 @@ def is_particle_preserving(circuit, n):
     # QHACK #
     states = basis_states(n)
     finals = []
-    
+
     for state in states:
         finals.append(circuit(state))
-        
-    for i in range(2 ** n):
+
+    for i in range(2**n):
         count_inp = 0
         for val in states[i]:
             count_inp += val
-        for j in range(2 ** n):
+        for j in range(2**n):
             if finals[i][j] != 0:
                 count_out = 0
                 for val in states[j]:
                     count_out += val
                 if count_inp != count_out:
                     return False
-    
+
     return True
 
     # QHACK #

@@ -47,7 +47,7 @@ def generating_fourier_state(n_qubits, m):
         # QHACK #
 
         # The return error should be smaller when the state m is more likely to be obtained.
-        return (probs[m] - 1)**2
+        return (probs[m] - 1) ** 2
         # QHACK #
 
     # This subroutine will find the angles that minimize the error function.

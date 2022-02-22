@@ -29,6 +29,7 @@ def is_bomb(angle):
 def splitter(angle):
     qml.RY(2 * angle, wires=0)
 
+
 @qml.qnode(dev)
 def bomb_tester(angle):
     """Construct a circuit that implements a final one-shot measurement, given that the bomb does not explode
@@ -80,7 +81,6 @@ def simulate(angle, n):
                 non_explosion_detection += 1
         else:
             did_explode += 1
-
 
     return non_explosion_detection / no_explosion
 

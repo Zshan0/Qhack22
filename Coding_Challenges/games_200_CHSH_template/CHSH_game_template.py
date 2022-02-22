@@ -30,7 +30,7 @@ def prepare_entangled(alpha, beta):
 
 
 # @qml.qnode(dev)
-@qml.qnode(dev, interface='autograd')
+@qml.qnode(dev, interface="autograd")
 def chsh_circuit(theta_A0, theta_A1, theta_B0, theta_B1, x, y, alpha, beta):
     """Construct a circuit that implements Alice's and Bob's measurements in the rotated bases
 
@@ -75,17 +75,16 @@ def winning_prob(params, alpha, beta):
     answer = 0
 
     probs = chsh_circuit(*params, x=0, y=0, alpha=alpha, beta=beta)
-    answer += (probs[0] + probs[3]) # 0.0 = 0 + 0  or 1 + 1
+    answer += probs[0] + probs[3]  # 0.0 = 0 + 0  or 1 + 1
     probs = chsh_circuit(*params, x=0, y=1, alpha=alpha, beta=beta)
-    answer += (probs[0] + probs[3]) # 0.1 = 0 + 0  or 1 + 1
+    answer += probs[0] + probs[3]  # 0.1 = 0 + 0  or 1 + 1
     probs = chsh_circuit(*params, x=1, y=0, alpha=alpha, beta=beta)
-    answer += (probs[0] + probs[3]) # 1.0 = 0 + 0  or 1 + 1
+    answer += probs[0] + probs[3]  # 1.0 = 0 + 0  or 1 + 1
     probs = chsh_circuit(*params, x=1, y=1, alpha=alpha, beta=beta)
-    answer += (probs[1] + probs[2]) # 1.1 = 1 + 0  or 1 + 0
-    
+    answer += probs[1] + probs[2]  # 1.1 = 1 + 0  or 1 + 0
+
     answer = answer / 4
     return answer
-    
 
     # QHACK #
 
@@ -100,10 +99,10 @@ def optimize(alpha, beta):
     Returns:
         - (float): Probability of winning
     """
+
     def cost(params):
         """Define a cost function that only depends on params, given alpha and beta fixed"""
         return -winning_prob(params, alpha, beta)
-
 
     # QHACK #
 
@@ -114,12 +113,12 @@ def optimize(alpha, beta):
     steps = int(500)
 
     # QHACK #
-    
+
     # set the initial parameter values
     params = init_params
 
     for _ in range(steps):
-        # update the circuit parameters 
+        # update the circuit parameters
         # QHACK #
 
         params = opt.step(cost, params)

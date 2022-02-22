@@ -18,7 +18,7 @@ def check_simplification(op1, op2):
 
     # QHACK
     for i, j in zip(op1, op2):
-        if i != j and i != 'I' and j != 'I':
+        if i != j and i != "I" and j != "I":
             return False
     return True
     # QHACK
@@ -40,7 +40,7 @@ def join_operators(op1, op2):
     # QHACK
     res = []
     for i, j in zip(op1, op2):
-        res.append(j if i == 'I' else i)
+        res.append(j if i == "I" else i)
     return res
     # QHACK
 
